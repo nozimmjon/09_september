@@ -1,74 +1,4 @@
 
-
-#importing data
-andijon_telegram <- read_excel(here("data", "telegram", "andijon.txt_uzbek.xlsx"))
-
-red_flag <- "📮"
-
-
-
-exclude_phrases <- c("qolgan to`lovi bor", "to`langan", "тўланган", "imtiyozlik", 
-                     "tanidan", "танидан", "krediti", "qolgan", "kvartira kerak",
-                     "hovli", "ховли", "нотурар", "noturar", "ipoteka", "ипотека",
-                     "subsidiya", "субсидия", "subsidiyasi", "kredit", "kreditga", 
-                     "krediti", "кредит", "кредитга", "кредити", "имтиёзлик", "имтиёзли",
-                     "imtiyozlik", "imtiyozli", "qarzi qolgan", "qarzi bor", "карзи бор",
-                     "қарзи бор", "қарзи қолган", "карзи колган", "ойлик тўлов", "ойлик тулов",
-                     "ойига", "бўлиб тўлаш", "oylik to'lov", "oylik tulov", "oyiga", "bulib tulash", 
-                     "bo'lib to'lash", "uchastka", "участка", "kvartira olaman", "sotildi", "ijara", "ijaraga",
-                     "sotix", "qarzi bor", "subsidiyaga", "tanidan", "navastroyka", "novostroyka", "qolgan", 
-                     "kvartira kerak", "kvartira beriladi", "kvartira ga"
-)
-
-cleaned_andijan <- andijon_telegram %>% 
-  select(-channel, -post_id, -views) %>% 
-  mutate(date_format = ymd_hms(date)) %>% 
-  mutate(month = month(date_format, label = TRUE)) %>%
-  # filter(str_detect(post, red_flag)) %>% 
-  mutate(post = str_trim(post),
-         post = str_squish(post),
-         post = str_to_lower(post)) %>% 
-  filter(!reduce(exclude_phrases, ~ .x | str_detect(post, .y), .init = FALSE)) %>% 
-  mutate(num_rooms = str_extract(post, "\\d+(?= xona)")) %>% 
-  mutate(area = str_extract(post, "(\\d+[\\.,]?\\d*)+(?= m²)")) %>% 
-  mutate(price_post = str_replace(post, "💲", " dollars")) %>% 
-  mutate(price_post = str_replace(price_post, "💰", "price ")) %>% 
-  mutate(narx = str_extract(price_post, "(\\d+[\\.,]?\\d*)+(?= dollars)")) %>% 
-  mutate(narx2 = str_extract(price_post, "(?<=price?\\s{0,10})(\\d+[\\.,]?\\d*)")) %>% 
-  group_by(num_rooms, area, narx, narx2) %>% 
-  slice(1L) %>% 
-  ungroup() %>% 
-  select(-date, -date_format) %>% 
-  mutate(final_price = if_else(is.na(narx), narx2, narx)) %>% 
-  mutate(area = if_else(is.na(area) & num_rooms == 1, "35", area)) %>% 
-  mutate(area = if_else(is.na(area) & num_rooms == 2, "55", area)) %>%
-  mutate(area = if_else(is.na(area) & num_rooms == 3, "75", area)) %>%
-  mutate(area = if_else(is.na(area) & num_rooms == 4, "105", area)) %>% 
-  mutate(final_price = str_replace(final_price, pattern = "\\.", replacement = "")) %>% 
-  #mutate(final_price = str_replace(final_price, pattern = ",", replacement = "")) %>% 
-  mutate(area = str_replace(area, pattern = ",", replacement = "\\.")) %>% 
-  mutate(final_price = parse_number(final_price), 
-         area = parse_number(area)) %>% 
-  mutate(price_m2 = final_price/area) %>% 
-  filter(area < 200) %>% 
-  mutate(region = "Андижон") %>% 
-  mutate(month = as.character(month),
-         num_rooms = as.integer(num_rooms), 
-         price_m2 = as.double(price_m2),
-         final_price = as.integer(final_price),
-         area = as.double(area)) %>% 
-  rename("price" = final_price) %>% 
-  filter(area > 10) %>%
-  filter(price_m2 > 100) %>%
-  #filter(month == "дек") %>% 
-  select(-price_post, area, -narx, -narx2, -post) %>% 
-  drop_na(price_m2, num_rooms) %>% 
-  filter(price_m2 < 1000)
-
-
-# write_xlsx(cleaned_andijan, "andijon_telegram.xlsx")  
-
-
 #importing data
 namangan_telegram <- read_excel(here("data", "telegram", "namangan.txt_uzbek.xlsx"))
 
@@ -139,8 +69,6 @@ cleaned_namangan <- namangan_telegram %>%
          price_m2 = as.double(price_m2),
          price = as.integer(price),
          area = as.double(area))
-
-# write_xlsx(cleaned_namangan, "namangan_telegram.xlsx")  
 
 
 #importing data for regions with limited data 

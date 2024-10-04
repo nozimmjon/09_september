@@ -15,16 +15,16 @@ final_data <- bind_rows(cleaned_data, cleaned_telegram) %>%
   filter(!(region %in% c("Сирдарё", "Жиззах") & price_m2 > 900))
   
 
-final_data %>% 
-  filter(region == "Сирдарё") %>% 
-  ggplot(aes(x = price_m2, y = 1)) +
-  geom_jitter(width = 0, alpha = 0.5) +
-  scale_y_discrete() +
-  # facet_wrap(~city)+
-  labs(y = "", x = "price")
-
-
-dfSummary(final_data) %>% summarytools::stview()
+# final_data %>% 
+#   filter(region == "Сирдарё") %>% 
+#   ggplot(aes(x = price_m2, y = 1)) +
+#   geom_jitter(width = 0, alpha = 0.5) +
+#   scale_y_discrete() +
+#   # facet_wrap(~city)+
+#   labs(y = "", x = "price")
+# 
+# 
+# dfSummary(final_data) %>% summarytools::stview()
 
 
 price_reg <- final_data %>% 

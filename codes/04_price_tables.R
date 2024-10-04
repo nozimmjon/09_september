@@ -6,7 +6,7 @@
 #joining telegram and olx data on secondary market 
 
 final_data <- bind_rows(cleaned_data, cleaned_telegram) %>% 
-  filter(month != "июль") %>% 
+  filter(month != "август") %>% 
   filter(price_m2 > 100) %>% 
   group_by(region) %>% 
   arrange(desc(price_m2)) %>% 
@@ -15,13 +15,13 @@ final_data <- bind_rows(cleaned_data, cleaned_telegram) %>%
   filter(!(region %in% c("Сирдарё", "Жиззах") & price_m2 > 900))
   
 
-# final_data %>% 
-#   filter(region == "Сирдарё") %>% 
-#   ggplot(aes(x = price_m2, y = 1)) +
-#   geom_jitter(width = 0, alpha = 0.5) +
-#   scale_y_discrete() +
-#   # facet_wrap(~city)+
-#   labs(y = "", x = "price")
+final_data %>%
+  filter(region == "Сирдарё") %>%
+  ggplot(aes(x = price_m2, y = 1)) +
+  geom_jitter(width = 0, alpha = 0.5) +
+  scale_y_discrete() +
+  # facet_wrap(~city)+
+  labs(y = "", x = "price")
 # 
 # 
 # dfSummary(final_data) %>% summarytools::stview()

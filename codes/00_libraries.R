@@ -23,7 +23,17 @@ library(gt)
 library(gtExtras)
 library(kableExtra)
 library(ggsci)
-library(emo)
-library(tidyverse)
 library(summarytools)
 library(usethis)
+library(lmtest)
+library(car)
+library(hrbrthemes)  # Provides IMF/WB-like themes
+library(scales)  # For number formatting
+library(tidyr)
+library(zoo)
+library(forecast)
+library(MASS)      # Robust regression
+library(sandwich)  # Robust standard errors
+library(lmtest)    # Hypothesis testing
+library(ordinal) 
+library(tidyverse)
